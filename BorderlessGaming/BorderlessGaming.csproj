@@ -238,6 +238,7 @@
       $(PostBuildEventDependsOn);
       PostBuildMacros;
     </PostBuildEventDependsOn>
+  </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>copy $(SolutionDir)SteamLibs\* $(ProjectDir)$(OutDir)</PreBuildEvent>
   </PropertyGroup>
