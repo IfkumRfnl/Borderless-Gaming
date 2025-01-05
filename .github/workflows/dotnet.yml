@@ -19,9 +19,16 @@ jobs:
     - name: Setup .NET Framework 4.8
       uses: microsoft/setup-msbuild@v1
 
-    - name: Install Windows SDK
+    - name: Install Windows SDK with Signing Tools
+      uses: ChristopheLav/windows-sdk-install@v1
+      with:
+        version-sdk: '22621'  # Specify the desired SDK version
+        features: 'OptionId.SigningTools'  # Install the Signing Tools feature
+
+    - name: Add signtool to PATH
       run: |
-        choco install visualstudio2022-workload-vctools -y
+        $env:Path += ';C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64'
+      shell: powershell
 
     - name: Restore dependencies
       run: nuget restore
