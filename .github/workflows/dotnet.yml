@@ -63,3 +63,13 @@ jobs:
           Write-Error "signtool.exe not found in Windows Kits directory."
         }
       shell: powershell
+
+    - name: Zip the folder
+      run: |
+        Compress-Archive -Path 'D:/a/Borderless-Gaming/Borderless-Gaming/BorderlessGaming/bin/Release/*' -DestinationPath 'output.zip'
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: zipped-folder
+        path: output.zip 
