@@ -1,0 +1,26 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup .NET Framework 4.8
+      uses: microsoft/setup-msbuild@v1
+
+    - name: Restore dependencies
+      run: nuget restore
+
+    - name: Build the project
+      run: msbuild /p:Configuration=Release
