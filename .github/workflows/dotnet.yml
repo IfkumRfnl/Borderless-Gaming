@@ -26,8 +26,9 @@ jobs:
         features: 'OptionId.SigningTools'  # Install the Signing Tools feature
 
         
-    - name: List Windows SDK directories
+    - name: Debug: List Windows SDK directories
       run: dir "C:\Program Files (x86)\Windows Kits\10\bin" /s
+
   
     - name: Add signtool to PATH
       run: |
