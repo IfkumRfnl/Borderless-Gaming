@@ -19,21 +19,24 @@ jobs:
     - name: Setup .NET Framework 4.8
       uses: microsoft/setup-msbuild@v1
 
-    - name: Install Windows SDK with Signing Tools
-      uses: ChristopheLav/windows-sdk-install@v1
-      with:
-        version-sdk: '22621'  # Specify the desired SDK version
-        features: 'OptionId.SigningTools'  # Install the Signing Tools feature
+      
+    - name: Install Windows SDK
+      run: choco install windows-sdk-10.0 -y
 
-        
-    - name: Debug: List Windows SDK directories
-      run: dir "C:\Program Files (x86)\Windows Kits\10\bin" /s
-
-  
-    - name: Add signtool to PATH
+    - name: Confirm signtool availability
+      run: dir "C:\Program Files (x86)\Windows Kits\10\bin" /s | find "signtool.exe"
+    - name: Find and Add signtool to PATH
       run: |
-        $env:Path += ';C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64'
+        $signtoolPath = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse | Select-Object -ExpandProperty DirectoryName
+        if ($signtoolPath) {
+          $env:Path += ";$signtoolPath"
+          Write-Host "Added signtool.exe to PATH: $signtoolPath"
+        } else {
+          Write-Error "signtool.exe not found in Windows Kits directory."
+        }
       shell: powershell
+
+
 
     - name: Restore dependencies
       run: nuget restore
