@@ -25,6 +25,10 @@ jobs:
         version-sdk: '22621'  # Specify the desired SDK version
         features: 'OptionId.SigningTools'  # Install the Signing Tools feature
 
+        
+    - name: List Windows SDK directories
+      run: dir "C:\Program Files (x86)\Windows Kits\10\bin" /s
+  
     - name: Add signtool to PATH
       run: |
         $env:Path += ';C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64'
