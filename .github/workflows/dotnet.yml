@@ -22,20 +22,20 @@ jobs:
     - name: Cache x64 Windows SDK
       uses: actions/cache@v2
       with:
-        path: C:\Program Files (x86)\Windows Kits\10\bin\x64
+        path: C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64
         key: ${{ runner.os }}-windows-sdk-x64-${{ hashFiles('**/your_project_file') }}
         restore-keys: |
           ${{ runner.os }}-windows-sdk-x64-
 
     - name: Install x64 Windows SDK if not cached
       run: |
-        if (-Not (Test-Path "C:\Program Files (x86)\Windows Kits\10\bin\x64")) {
+        if (-Not (Test-Path "C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64")) {
           choco install windows-sdk-10.0 -y
         }
 
     - name: Confirm signtool availability
       run: |
-        $signtoolPath = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin\x64" -Recurse -Filter "signtool.exe" | Select-Object -First 1
+        $signtoolPath = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64" -Recurse -Filter "signtool.exe" | Select-Object -First 1
         if ($signtoolPath) {
           Write-Host "Found signtool.exe at: $($signtoolPath.FullName)"
         } else {
@@ -45,11 +45,11 @@ jobs:
 
     - name: Find and Add signtool to PATH
       run: |
-        # Check in the x64 folder first
-        $signtoolPath = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin\x64" -Recurse -Filter "signtool.exe" | Select-Object -First 1
+        # Check in the x64 versioned folder first
+        $signtoolPath = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64" -Recurse -Filter "signtool.exe" | Select-Object -First 1
         if (-Not $signtoolPath) {
           # If not found in x64, fall back to the ARM version
-          $signtoolPath = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin\arm64" -Recurse -Filter "signtool.exe" | Select-Object -First 1
+          $signtoolPath = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\arm" -Recurse -Filter "signtool.exe" | Select-Object -First 1
         }
         if ($signtoolPath) {
           $env:Path += ";$($signtoolPath.DirectoryName)"
