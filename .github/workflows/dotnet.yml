@@ -19,24 +19,40 @@ jobs:
     - name: Setup .NET Framework 4.8
       uses: microsoft/setup-msbuild@v1
 
-      
-    - name: Install Windows SDK
-      run: choco install windows-sdk-10.0 -y
+    - name: Cache Windows SDK
+      uses: actions/cache@v2
+      with:
+        path: C:\Program Files (x86)\Windows Kits\10
+        key: ${{ runner.os }}-windows-sdk-${{ hashFiles('**/your_project_file') }}
+        restore-keys: |
+          ${{ runner.os }}-windows-sdk-
+
+    - name: Install Windows SDK if not cached
+      run: |
+        if (-Not (Test-Path "C:\Program Files (x86)\Windows Kits\10")) {
+          choco install windows-sdk-10.0 -y
+        }
 
     - name: Confirm signtool availability
-      run: dir "C:\Program Files (x86)\Windows Kits\10\bin" /s | find "signtool.exe"
-    - name: Find and Add signtool to PATH
       run: |
-        $signtoolPath = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse | Select-Object -ExpandProperty DirectoryName
+        $signtoolPath = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter "signtool.exe" | Select-Object -First 1
         if ($signtoolPath) {
-          $env:Path += ";$signtoolPath"
-          Write-Host "Added signtool.exe to PATH: $signtoolPath"
+          Write-Host "Found signtool.exe at: $($signtoolPath.FullName)"
         } else {
           Write-Error "signtool.exe not found in Windows Kits directory."
         }
       shell: powershell
 
-
+    - name: Find and Add signtool to PATH
+      run: |
+        $signtoolPath = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter "signtool.exe" | Select-Object -First 1
+        if ($signtoolPath) {
+          $env:Path += ";$($signtoolPath.DirectoryName)"
+          Write-Host "Added signtool.exe to PATH: $($signtoolPath.DirectoryName)"
+        } else {
+          Write-Error "signtool.exe not found in Windows Kits directory."
+        }
+      shell: powershell
 
     - name: Restore dependencies
       run: nuget restore
