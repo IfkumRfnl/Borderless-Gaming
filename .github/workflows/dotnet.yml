@@ -43,7 +43,10 @@ jobs:
         }
       shell: powershell
 
-    - name: Find and Add signtool to PATH
+    - name: Restore dependencies
+      run: nuget restore
+
+    - name: Build the project
       run: |
         # Check in the x64 versioned folder first
         $signtoolPath = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64" -Recurse -Filter "signtool.exe" | Select-Object -First 1
@@ -54,13 +57,9 @@ jobs:
         if ($signtoolPath) {
           $env:Path += ";$($signtoolPath.DirectoryName)"
           Write-Host "Added signtool.exe to PATH: $($signtoolPath.DirectoryName)"
+          Add-Content $env:GITHUB_PATH "$($signtoolPath.DirectoryName)"
+          msbuild /p:Configuration=Release
         } else {
           Write-Error "signtool.exe not found in Windows Kits directory."
         }
       shell: powershell
-
-    - name: Restore dependencies
-      run: nuget restore
-
-    - name: Build the project
-      run: msbuild /p:Configuration=Release
